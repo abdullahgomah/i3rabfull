@@ -7,8 +7,8 @@ class GrammarNote(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاريخ الإنشاء")
 
     class Meta:
-        verbose_name = "ملاحظة نحوية"
-        verbose_name_plural = "ملاحظات نحوية"
+        verbose_name = "تعليمة نحوية"
+        verbose_name_plural = "تعليمات نحوية "
         ordering = ['-created_at']
 
 class GlobalIrabRecord(models.Model):
