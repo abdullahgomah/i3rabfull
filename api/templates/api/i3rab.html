@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعراب الجملة العربية</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: #fff;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        p.description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1.1em;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .result-box {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-right: 5px solid var(--accent-color);
+            border-radius: var(--border-radius);
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .error-message {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .form-errors {
+            color: #e74c3c;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>تحليل وإعراب الجملة العربية</h1>
+        <p class="description">أدخل جملتك العربية وسيقوم النظام بتحليلها وإعرابها إعراباً تفصيلياً بناءً على قواعد النحو المتقدمة.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.sentence.label_tag }}
+                {{ form.sentence }}
+                {% if form.sentence.errors %}
+                    <div class="form-errors">
+                        {% for error in form.sentence.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <button type="submit">إعراب الجملة</button>
+        </form>
+
+        {% if result %}
+            <div class="result-box">
+                <h3>تحليل الجملة: {{ result.sentence }}</h3>
+                <p><strong>ملخص الإعراب:</strong> {{ result.sentence_irab_summary }}</p>
+                
+                <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr style="background-color: var(--accent-color); color: white;">
+                            <th style="padding: 10px; border: 1px solid #ddd;">الكلمة</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">الترتيب</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">النوع النحوي</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">الإعراب</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">السبب</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for word in result.words %}
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold;">{{ word.word }}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ word.word_order }}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ word.grammatical_type }}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">{{ word.irab }}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">{{ word.reason }}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">{{ word.notes|default:"-" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if result.additional_notes %}
+                    <div style="margin-top: 20px; padding: 15px; background: #eef; border-radius: 8px;">
+                        <strong>ملاحظات إضافية:</strong> {{ result.additional_notes }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
