@@ -126,6 +126,5 @@ STATIC_URL = 'static/'
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "23.239.17.118",
-    "23.239.17.118:8000"
+    "https://23.239.17.118",
 ]
